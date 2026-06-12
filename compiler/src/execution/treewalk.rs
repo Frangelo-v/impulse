@@ -45,16 +45,17 @@ pub enum Value {
     Null,
     List(Vec<Value>),
     Map(Vec<(String, Value)>),
-    Err { message: String, code: i64 },
+    // Los errores son Object { name: "error", fields: {message, code} } —
+    // así `error { ... }` del usuario y los de stdlib son indistinguibles.
     Object  { name: String, fields: HashMap<String, Value> },
     Variant { variant: String, case: String, fields: HashMap<String, Value> },
 }
 
-// Value is pure data — no Rc, no raw pointers.
-unsafe impl Send for Value {}
-unsafe impl Sync for Value {}
-
 impl Value {
+    pub fn is_error(&self) -> bool {
+        matches!(self, Value::Object { name, .. } if name == "error")
+    }
+
     pub fn truthy(&self) -> bool {
         match self {
             Value::Bool(v)   => *v,
@@ -64,7 +65,7 @@ impl Value {
             Value::Str(v)    => !v.is_empty(),
             Value::List(v)   => !v.is_empty(),
             Value::Map(v)    => !v.is_empty(),
-            Value::Err { .. } => false,
+            v if v.is_error() => false,
             _                => true,
         }
     }
@@ -78,8 +79,7 @@ impl Value {
             Value::Null          => "Null",
             Value::List(_)       => "List",
             Value::Map(_)        => "Map",
-            Value::Err { .. }    => "error",
-            Value::Object { name, .. } if name == "error" => "error",
+            v if v.is_error()    => "error",
             Value::Object { .. } => "cluster",
             Value::Variant { .. } => "enum",
         }
@@ -92,7 +92,6 @@ impl Value {
             Value::Bool(v)   => v.to_string(),
             Value::Str(v)    => v.clone(),
             Value::Null      => "null".into(),
-            Value::Err { message, code } => format!("error({}: {})", code, message),
             Value::List(items) => {
                 let inner = items.iter().map(|v| v.display()).collect::<Vec<_>>().join(", ");
                 format!("[{}]", inner)
@@ -267,7 +266,7 @@ impl BrainState {
         let mut actor_state: HashMap<String, HashMap<String, Value>> = HashMap::new();
 
         for decl in &program.decls {
-            if let TopDecl::Cortex(c) = decl {
+            if let TopDecl::Shared(c) = decl {
                 if let Ok(v) = eval_const(& c.value) { shared.insert(c.name.clone(), v); }
             }
         }
@@ -430,7 +429,7 @@ impl Evaluator {
 
     fn exec_stmt(&self, stmt: &Stmt, env: &mut Env) -> RunResult<Flow> {
         match stmt {
-            Stmt::Decl(TopDecl::Charge(decl)) => {
+            Stmt::Decl(TopDecl::Binding(decl)) => {
                 let v = self.eval_expr(&decl.value, env)?;
                 env.set_local(decl.name.clone(), v);
                 Ok(Flow::Continue(Value::Null))
@@ -606,13 +605,14 @@ impl Evaluator {
             ExprKind::Coalesce(a, b) => {
                 let val = self.eval_expr(a, env)?;
                 match val {
-                    Value::Null | Value::Err { .. } => self.eval_expr(b, env),
+                    Value::Null => self.eval_expr(b, env),
+                    v if v.is_error() => self.eval_expr(b, env),
                     other => Ok(other),
                 }
             }
 
             // ── Node return ──────────────────────────────────────────────────
-            ExprKind::Pulse(expr) | ExprKind::Yield(expr) | ExprKind::Collect(expr) =>
+            ExprKind::Pulse(expr) | ExprKind::Yield(expr) | ExprKind::Await(expr) =>
                 self.eval_expr(expr, env),
 
             // ── Signal emission (Signal Registry → Scheduler) ────────────────
@@ -632,13 +632,13 @@ impl Evaluator {
             }
 
             // ── Surge lifecycle ───────────────────────────────────────────────
-            ExprKind::Open { label, callee, args } =>
+            ExprKind::Start { label, callee, args } =>
                 self.start_surge(label.as_deref(), callee, args, env),
 
-            ExprKind::OpenSupervisor(name) =>
+            ExprKind::StartSupervisor(name) =>
                 self.start_supervisor(name),
 
-            ExprKind::Close(label) => {
+            ExprKind::Stop(label) => {
                 if let Some(entry) = self.surges.lock().unwrap().get(label) {
                     entry.shutdown.store(true, Ordering::Release);
                 }
@@ -646,7 +646,7 @@ impl Evaluator {
             }
 
             // sleep — parks the current thread (no polling)
-            ExprKind::Rest(ms_expr) => {
+            ExprKind::Sleep(ms_expr) => {
                 let ms = match self.eval_expr(ms_expr, env)? {
                     Value::Int(n) => n as u64,
                     _ => 0,
@@ -692,7 +692,7 @@ impl Evaluator {
             }
 
             // ── Control flow ──────────────────────────────────────────────────
-            ExprKind::When { cond, then, else_ifs, else_ } => {
+            ExprKind::If { cond, then, else_ifs, else_ } => {
                 if self.eval_expr(cond, env)?.truthy() {
                     return self.exec_if_branch(then, env);
                 }

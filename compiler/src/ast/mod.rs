@@ -21,9 +21,9 @@ pub enum TopDecl {
     Domain(DomainDecl),
     Supervisor(SupervisorDecl),
     Signal(SignalDecl),
-    Charge(ChargeDecl),
-    Cortex(CortexDecl),
-    Link(LinkDecl),
+    Binding(BindingDecl),
+    Shared(SharedDecl),
+    Use(UseDecl),
 }
 
 // ── Node ─────────────────────────────────────────────────────────────────────
@@ -195,7 +195,7 @@ pub struct ActorDecl {
     pub span: Span,
     pub name: String,
     pub attrs: ActorAttrs,
-    pub fields: Vec<ChargeDecl>, // actor fields have initializers like let x: Int = 0
+    pub fields: Vec<BindingDecl>, // actor fields have initializers like let x: Int = 0
     pub methods: Vec<NodeDecl>,
 }
 
@@ -240,7 +240,7 @@ pub struct SupervisorChild {
 // ── Charge / Cortex / Link ────────────────────────────────────────────────────
 
 #[derive(Debug, Clone)]
-pub struct ChargeDecl {
+pub struct BindingDecl {
     pub span: Span,
     pub name: String,
     pub immutable: bool,
@@ -249,7 +249,7 @@ pub struct ChargeDecl {
 }
 
 #[derive(Debug, Clone)]
-pub struct CortexDecl {
+pub struct SharedDecl {
     pub span: Span,
     pub name: String,
     pub ty: TypeExpr,
@@ -257,7 +257,7 @@ pub struct CortexDecl {
 }
 
 #[derive(Debug, Clone)]
-pub struct LinkDecl {
+pub struct UseDecl {
     pub span: Span,
     pub names: Vec<String>,
     pub source: String,
@@ -408,21 +408,21 @@ pub enum ExprKind {
         ownership: SignalOwnership,
         priority: SignalPriority,
     },
-    Open {
+    Start {
         label: Option<String>,
         callee: Box<Expr>,
         args: Vec<Expr>,
     },
-    OpenSupervisor(String),
-    Close(String),
-    Collect(Box<Expr>),
-    Rest(Box<Expr>),
+    StartSupervisor(String),
+    Stop(String),
+    Await(Box<Expr>),
+    Sleep(Box<Expr>),
 
     // Trace
     TraceRecv(Box<Expr>),
 
     // Control flow
-    When {
+    If {
         cond: Box<Expr>,
         then: Vec<Stmt>,
         else_ifs: Vec<(Expr, Vec<Stmt>)>,

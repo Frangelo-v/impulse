@@ -138,10 +138,10 @@ impl Parser {
             Some(Token::KwSupervisor) => Ok(TopDecl::Supervisor(self.parse_supervisor_decl()?)),
             Some(Token::KwSignal) => Ok(TopDecl::Signal(self.parse_signal_decl()?)),
             Some(Token::KwLet) | Some(Token::KwConst) => {
-                Ok(TopDecl::Charge(self.parse_charge_decl()?))
+                Ok(TopDecl::Binding(self.parse_binding_decl()?))
             }
-            Some(Token::KwShared) => Ok(TopDecl::Cortex(self.parse_cortex_decl()?)),
-            Some(Token::KwUse) => Ok(TopDecl::Link(self.parse_link_decl()?)),
+            Some(Token::KwShared) => Ok(TopDecl::Shared(self.parse_shared_decl()?)),
+            Some(Token::KwUse) => Ok(TopDecl::Use(self.parse_use_decl()?)),
             _ => Err(format!(
                 "unexpected {} at top level\n\
                  help: a file is made of declarations: node, signal, when, \
@@ -525,7 +525,7 @@ impl Parser {
             match self.peek() {
                 Some(Token::KwLet) | Some(Token::KwConst) => {
                     // Actor fields: let name: Type = value
-                    fields.push(self.parse_charge_decl()?);
+                    fields.push(self.parse_binding_decl()?);
                 }
                 Some(Token::KwNode) => {
                     methods.push(self.parse_node_decl()?);
@@ -710,7 +710,7 @@ impl Parser {
 
     // ── Charge / Cortex / Link ────────────────────────────────────────────────
 
-    fn parse_charge_decl(&mut self) -> ParseResult<ChargeDecl> {
+    fn parse_binding_decl(&mut self) -> ParseResult<BindingDecl> {
         let start = self.span().start;
         let immutable = match self.peek() {
             Some(Token::KwConst) => {
@@ -732,7 +732,7 @@ impl Parser {
         self.expect(&Token::Eq)?;
         let value = self.parse_expr(0)?;
         let end = self.span().start;
-        Ok(ChargeDecl {
+        Ok(BindingDecl {
             span: start..end,
             name,
             immutable,
@@ -741,7 +741,7 @@ impl Parser {
         })
     }
 
-    fn parse_cortex_decl(&mut self) -> ParseResult<CortexDecl> {
+    fn parse_shared_decl(&mut self) -> ParseResult<SharedDecl> {
         let start = self.span().start;
         self.advance(); // `shared`
         let name = self.expect_ident()?;
@@ -750,7 +750,7 @@ impl Parser {
         self.expect(&Token::Eq)?;
         let value = self.parse_expr(0)?;
         let end = self.span().start;
-        Ok(CortexDecl {
+        Ok(SharedDecl {
             span: start..end,
             name,
             ty,
@@ -758,7 +758,7 @@ impl Parser {
         })
     }
 
-    fn parse_link_decl(&mut self) -> ParseResult<LinkDecl> {
+    fn parse_use_decl(&mut self) -> ParseResult<UseDecl> {
         let start = self.span().start;
         self.advance(); // `use`
         let names = if self.eat(&Token::LBrace) {
@@ -777,7 +777,7 @@ impl Parser {
         self.expect(&Token::KwFrom)?;
         let source = self.expect_string()?;
         let end = self.span().start;
-        Ok(LinkDecl {
+        Ok(UseDecl {
             span: start..end,
             names,
             source,
@@ -1611,7 +1611,7 @@ impl Parser {
                     let end = self.span().start;
                     return Ok(Expr {
                         span: start..end,
-                        kind: ExprKind::OpenSupervisor(name),
+                        kind: ExprKind::StartSupervisor(name),
                     });
                 }
                 self.expect(&Token::LParen)?;
@@ -1624,7 +1624,7 @@ impl Parser {
                 });
                 Ok(Expr {
                     span: start..end,
-                    kind: ExprKind::Open {
+                    kind: ExprKind::Start {
                         label,
                         callee,
                         args,
@@ -1639,7 +1639,7 @@ impl Parser {
                 let end = self.span().start;
                 Ok(Expr {
                     span: start..end,
-                    kind: ExprKind::Close(label),
+                    kind: ExprKind::Stop(label),
                 })
             }
 
@@ -1650,7 +1650,7 @@ impl Parser {
                 let end = self.span().start;
                 Ok(Expr {
                     span: start..end,
-                    kind: ExprKind::Collect(Box::new(handle)),
+                    kind: ExprKind::Await(Box::new(handle)),
                 })
             }
 
@@ -1661,7 +1661,7 @@ impl Parser {
                 let end = self.span().start;
                 Ok(Expr {
                     span: start..end,
-                    kind: ExprKind::Rest(Box::new(ms)),
+                    kind: ExprKind::Sleep(Box::new(ms)),
                 })
             }
 
@@ -1677,7 +1677,7 @@ impl Parser {
             }
 
             // ── When ──────────────────────────────────────────────────────────
-            Some(Token::KwIf) => self.parse_when_expr(),
+            Some(Token::KwIf) => self.parse_if_expr(),
 
             // ── Loop ──────────────────────────────────────────────────────────
             Some(Token::KwLoop) => self.parse_loop_expr(),
@@ -1708,7 +1708,7 @@ impl Parser {
 
     // ── Control flow expressions ──────────────────────────────────────────────
 
-    fn parse_when_expr(&mut self) -> ParseResult<Expr> {
+    fn parse_if_expr(&mut self) -> ParseResult<Expr> {
         let start = self.span().start;
         self.advance(); // `if`
         let cond = self.parse_expr(0)?;
@@ -1732,7 +1732,7 @@ impl Parser {
         let end = self.span().start;
         Ok(Expr {
             span: start..end,
-            kind: ExprKind::When {
+            kind: ExprKind::If {
                 cond: Box::new(cond),
                 then,
                 else_ifs,

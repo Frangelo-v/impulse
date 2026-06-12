@@ -261,7 +261,7 @@ impl Ctx {
         match decl {
             TopDecl::Surge(s) => self.check_surge(s, inside_block),
             TopDecl::Node(n) => self.check_node(n),
-            TopDecl::Cortex(c) => self.check_cortex(c),
+            TopDecl::Shared(c) => self.check_cortex(c),
             TopDecl::Domain(d) => self.check_domain(d),
             TopDecl::Actor(a) => self.check_actor(a),
             TopDecl::Supervisor(s) => self.check_supervisor(s),
@@ -315,7 +315,7 @@ impl Ctx {
         self.current_surge = prev;
     }
 
-    fn check_cortex(&mut self, cortex: &CortexDecl) {
+    fn check_cortex(&mut self, cortex: &SharedDecl) {
         // shared only accepts scalar types
         let allowed = matches!(
             &cortex.ty,
@@ -462,8 +462,8 @@ impl Ctx {
             ExprKind::Pulse(e)
             | ExprKind::Yield(e)
             | ExprKind::Try(e)
-            | ExprKind::Collect(e)
-            | ExprKind::Rest(e)
+            | ExprKind::Await(e)
+            | ExprKind::Sleep(e)
             | ExprKind::TraceRecv(e) => {
                 self.check_expr(e);
             }
@@ -476,7 +476,7 @@ impl Ctx {
                 self.check_expr(a);
                 self.check_expr(b);
             }
-            ExprKind::When {
+            ExprKind::If {
                 cond,
                 then,
                 else_ifs,
@@ -510,7 +510,7 @@ impl Ctx {
                     self.check_stmts(&arm.body, true);
                 }
             }
-            ExprKind::Open { callee, args, .. } => {
+            ExprKind::Start { callee, args, .. } => {
                 self.check_expr(callee);
                 for a in args {
                     self.check_expr(a);

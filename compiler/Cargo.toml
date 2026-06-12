@@ -11,10 +11,6 @@ path = "src/main.rs"
 # Lexer: zero-copy, regex-based tokenizer
 logos = "0.14"
 
-# Error reporting with source spans
-miette = { version = "7", features = ["fancy"] }
-thiserror = "1"
-
 # CLI argument parsing
 clap = { version = "4", features = ["derive"] }
 
