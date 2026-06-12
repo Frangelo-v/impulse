@@ -48,6 +48,12 @@ Programs declare signals, dormant handlers, actors, domains, and supervised
 long-running surges. Work wakes through propagation instead of unstructured
 detached tasks.
 
+## Built with Impulse
+
+- [**impulse-telegram-bot**](https://github.com/Frangelo-v/impulse-telegram-bot) —
+  a Telegram echo bot that sleeps at 0% CPU until a message arrives. Real-world
+  proof of the dormancy thesis.
+
 ## A note from the author
 
 Impulse is a very ambitious personal project I dreamed up a long time ago.
