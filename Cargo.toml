@@ -1,3 +1,8 @@
 [workspace]
 members = ["compiler"]
 resolver = "2"
+
+# Los perfiles viven en la raíz del workspace; los de los miembros se ignoran.
+[profile.release]
+opt-level = 3
+lto       = true

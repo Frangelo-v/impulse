@@ -1,6 +1,6 @@
 [package]
 name    = "impulsec"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 edition = "2021"
 
 [[bin]]
@@ -8,7 +8,7 @@ name = "impulsec"
 path = "src/main.rs"
 
 [dependencies]
-# Lexer: zero-copy, regex-based tokenizer
+# Lexer: tokenizer basado en regex
 logos = "0.14"
 
 # CLI argument parsing
@@ -17,6 +17,3 @@ clap = { version = "4", features = ["derive"] }
 # std/http: blocking HTTP client for bots (TLS via rustls, no system deps)
 ureq = "2"
 
-[profile.release]
-opt-level = 3
-lto       = true

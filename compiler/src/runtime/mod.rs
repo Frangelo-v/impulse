@@ -830,11 +830,7 @@ impl SignalStats {
         }
     }
     pub fn avg_latency_us(&self) -> u64 {
-        if self.emissions == 0 {
-            0
-        } else {
-            self.total_lat_us / self.emissions
-        }
+        self.total_lat_us.checked_div(self.emissions).unwrap_or(0)
     }
     /// Signal amplification ratio: outputs / inputs
     pub fn amplification(&self) -> f64 {

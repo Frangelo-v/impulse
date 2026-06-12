@@ -1764,46 +1764,41 @@ impl Parser {
         let start = self.span().start;
         self.advance(); // `match`
 
-        // Select form: `match { binding <- ch -> ... }`
-        if self.peek() == Some(&Token::LBrace) {
-            if self.peek2() == Some(&Token::Ident(String::new())) || {
-                // check if the first token inside is an ident followed by <-
-                self.tokens
-                    .get(self.pos + 1)
-                    .map(|t| matches!(t.node, Token::Ident(_)))
-                    .unwrap_or(false)
-                    && self
-                        .tokens
-                        .get(self.pos + 2)
-                        .map(|t| t.node == Token::TraceRecv)
-                        .unwrap_or(false)
-            } {
-                self.advance(); // {
-                let mut arms = Vec::new();
-                while self.peek() != Some(&Token::RBrace) && !self.at_end() {
-                    let binding = self.expect_ident()?;
-                    self.expect(&Token::TraceRecv)?;
-                    let channel = self.parse_expr(0)?;
-                    self.expect(&Token::Arrow)?;
-                    let body = if self.peek() == Some(&Token::LBrace) {
-                        self.parse_block()?
-                    } else {
-                        vec![Stmt::Expr(self.parse_expr(0)?)]
-                    };
-                    self.eat(&Token::Comma);
-                    arms.push(SelectArm {
-                        binding,
-                        channel,
-                        body,
-                    });
-                }
-                self.expect(&Token::RBrace)?;
-                let end = self.span().start;
-                return Ok(Expr {
-                    span: start..end,
-                    kind: ExprKind::Select { arms },
+        // Select form: `match { binding <- ch -> ... }` — distinguished from a
+        // normal match by `{` followed directly by an ident and `<-`.
+        let is_select = self.peek() == Some(&Token::LBrace)
+            && self.tokens.get(self.pos + 1)
+                .map(|t| matches!(t.node, Token::Ident(_)))
+                .unwrap_or(false)
+            && self.tokens.get(self.pos + 2)
+                .map(|t| t.node == Token::TraceRecv)
+                .unwrap_or(false);
+        if is_select {
+            self.advance(); // {
+            let mut arms = Vec::new();
+            while self.peek() != Some(&Token::RBrace) && !self.at_end() {
+                let binding = self.expect_ident()?;
+                self.expect(&Token::TraceRecv)?;
+                let channel = self.parse_expr(0)?;
+                self.expect(&Token::Arrow)?;
+                let body = if self.peek() == Some(&Token::LBrace) {
+                    self.parse_block()?
+                } else {
+                    vec![Stmt::Expr(self.parse_expr(0)?)]
+                };
+                self.eat(&Token::Comma);
+                arms.push(SelectArm {
+                    binding,
+                    channel,
+                    body,
                 });
             }
+            self.expect(&Token::RBrace)?;
+            let end = self.span().start;
+            return Ok(Expr {
+                span: start..end,
+                kind: ExprKind::Select { arms },
+            });
         }
 
         let subject = self.parse_expr(0)?;

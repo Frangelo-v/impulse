@@ -1,5 +1,14 @@
 # Impulse Language Specification
-**Version:** 0.4.0 architecture draft
+**Version:** 0.1.0-beta.1
+
+> **Implementation status.** The language described in sections 2–13 is
+> implemented in `impulsec` and covered by tests, except: `sample:` /
+> `scope:` signal modes, `share`/`move` emission ownership, actor map-field
+> indexing (`self.users[id] = ...`), and `http.listen` — those are post-0.1.
+> Section 14 (runtime architecture) describes the target design; the current
+> runtime is a tree-walk interpreter that already honors the dormancy
+> guarantees of §17, measured in `bench/bench.ps1`: 0% CPU while idle,
+> ~570k signals/sec propagated.
 
 Impulse is a dormant reactive propagation language. Programs are not built around a call stack that happens to spawn async work; they are built around typed signals that activate only the regions that need to wake.
 

@@ -2,16 +2,13 @@ use std::collections::{HashMap, VecDeque};
 
 // ── Delivery modes ────────────────────────────────────────────────────────────
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub enum DeliveryMode {
+    #[default]
     Broadcast,
     Queue,
     Latest,
     Buffer(usize),
-}
-
-impl Default for DeliveryMode {
-    fn default() -> Self { DeliveryMode::Broadcast }
 }
 
 // ── Activation record ─────────────────────────────────────────────────────────

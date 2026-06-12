@@ -15,7 +15,7 @@ use std::path::PathBuf;
 #[command(
     name = "impulsec",
     about = "The Impulse language compiler",
-    version = "0.4.0"
+    version = env!("CARGO_PKG_VERSION")
 )]
 struct Cli {
     /// Source file to compile or run

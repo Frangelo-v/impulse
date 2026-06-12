@@ -1,4 +1,4 @@
-// Impulse Tree-Walk Evaluator — v0.1
+// Impulse Tree-Walk Evaluator
 //
 // Pipeline for signal dispatch:
 //   1. Signal emission  → ActivationKernel (Signal Registry + Scheduler)
@@ -787,7 +787,7 @@ impl Evaluator {
 
         let handle = thread::spawn(move || {
             let mut env = Env::new();
-            for (p, v) in surge.params.iter().zip(arg_vals.into_iter()) {
+            for (p, v) in surge.params.iter().zip(arg_vals) {
                 env.set_local(p.name.clone(), v);
             }
             eval.exec_surge_body(&surge.body, &mut env, &sd2);
@@ -1083,7 +1083,7 @@ impl Evaluator {
     fn call_math(&self, method: &str, args: &[Expr], env: &mut Env) -> RunResult<Value> {
         let vals = self.eval_args(args, env)?;
         let f = |v: &Value| -> f64 { match v { Value::Int(n) => *n as f64, Value::Float(f) => *f, _ => 0.0 } };
-        let a = vals.get(0).unwrap_or(&Value::Null);
+        let a = vals.first().unwrap_or(&Value::Null);
         let b = vals.get(1).unwrap_or(&Value::Null);
         Ok(match method {
             "floor" => Value::Int(f(a).floor() as i64),
@@ -1110,7 +1110,7 @@ impl Evaluator {
             "trim"        => Value::Str(s.trim().to_string()),
             "split" => Value::List(s.split(arg0().as_str()).map(|p| Value::Str(p.to_string())).collect()),
             "replace" => {
-                let from = args.get(0).map(|v| v.display()).unwrap_or_default();
+                let from = args.first().map(|v| v.display()).unwrap_or_default();
                 let to   = args.get(1).map(|v| v.display()).unwrap_or_default();
                 Value::Str(s.replace(from.as_str(), to.as_str()))
             }
