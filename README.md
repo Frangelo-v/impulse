@@ -1,6 +1,52 @@
-# Impulse
+# ⚡ Impulse
 
-Impulse is a dormant reactive propagation language: programs declare signals, dormant handlers, actors, domains, and supervised long-running surges. Work wakes through propagation instead of unstructured detached tasks.
+**The language where waiting costs nothing.**
+
+[![Release](https://img.shields.io/github/v/release/Frangelo-v/impulse?include_prereleases&label=release)](https://github.com/Frangelo-v/impulse/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Built with Rust](https://img.shields.io/badge/built%20with-Rust-orange.svg)](compiler/)
+
+Impulse is a *dormant reactive* language: your code declares typed signals and
+handlers that **sleep at literally 0% CPU** until a signal wakes them — like
+neurons waiting for an impulse. No event loop to write, no callbacks to nest,
+no polling anywhere in the runtime.
+
+```impulse
+signal pedido: Str [broadcast]
+signal enviado: Str [broadcast]
+
+// Dormant handler: costs nothing until a signal arrives
+when pedido(producto: Str) {
+    io.print("cobrando " + producto)
+    signal enviado(producto)
+}
+
+when enviado(producto: Str) {
+    io.print("en camino: " + producto)
+}
+
+node main() {
+    signal pedido("teclado")      // wakes the whole chain
+}
+```
+
+Crashes don't take the program down — supervisors restart failed work,
+Erlang-style:
+
+```impulse
+supervisor App {
+    strategy: one_for_one
+    child worker: handler() [max_restarts: 5, window: 60_000]
+}
+```
+
+**Measured, not promised** (see [the benchmark](#the-thesis-measured)):
+an idle Impulse program uses **0% CPU** while a polling equivalent burns ~98%
+of a core, and the interpreter propagates **~630,000 signals/sec**.
+
+Programs declare signals, dormant handlers, actors, domains, and supervised
+long-running surges. Work wakes through propagation instead of unstructured
+detached tasks.
 
 ## Current Components
 
