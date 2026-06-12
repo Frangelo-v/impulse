@@ -1,0 +1,38 @@
+// Enums con payload y match con bindings
+
+use io from "std/io"
+
+enum Estado {
+    Online
+    Ausente { desde: Int }
+    Offline
+}
+
+enum Forma {
+    Circulo  { radio: Int }
+    Cuadrado { lado: Int }
+}
+
+node describe(e: Estado) -> Str {
+    match e {
+        Estado.Online           -> "en linea"
+        Estado.Ausente { desde } -> "ausente desde " + desde
+        Estado.Offline          -> "desconectado"
+    }
+}
+
+node area_aprox(f: Forma) -> Int {
+    match f {
+        Forma.Circulo { radio }  -> 3 * radio * radio
+        Forma.Cuadrado { lado }  -> lado * lado
+    }
+}
+
+node main() {
+    io.print(describe(Estado.Online))
+    io.print(describe(Estado.Ausente { desde: 120 }))
+    io.print(describe(Estado.Offline))
+
+    io.print("circulo r2: " + area_aprox(Forma.Circulo { radio: 2 }))
+    io.print("cuadrado l5: " + area_aprox(Forma.Cuadrado { lado: 5 }))
+}

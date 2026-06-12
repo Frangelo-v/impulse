@@ -1,0 +1,17 @@
+// Estilo polling: el mismo trabajo, pero esperando con un bucle que pregunta
+// "¿hay algo?" sin parar. Quema un núcleo entero para no hacer nada.
+
+use io from "std/io"
+
+shared trabajo: Int = 0
+shared procesados: Int = 0
+
+node main() {
+    io.print("listo, sondeando")
+    loop {
+        if shared.trabajo > 0 {
+            shared.procesados += shared.trabajo
+            shared.trabajo = 0
+        }
+    }
+}

@@ -1,0 +1,38 @@
+// Manejo de errores con uniones `Tipo | error`
+
+use io from "std/io"
+
+node divide(a: Int, b: Int) -> Int | error {
+    if b == 0 {
+        pulse error { message: "division por cero", code: 500 }
+    }
+    pulse a / b
+}
+
+node valida(nombre: Str) -> Str | error {
+    if nombre == "" {
+        pulse error { message: "nombre vacio", code: 400 }
+    }
+    pulse "ok: " + nombre
+}
+
+node reporta(r: Int | error) {
+    match r {
+        n: Int   -> io.print("resultado: " + n)
+        e: error -> io.print("fallo " + e.code + ": " + e.message)
+    }
+}
+
+node main() {
+    reporta(divide(10, 2))
+    reporta(divide(7, 0))
+
+    match valida("alex") {
+        s: Str   -> io.print(s)
+        e: error -> io.print("error: " + e.message)
+    }
+    match valida("") {
+        s: Str   -> io.print(s)
+        e: error -> io.print("error: " + e.message)
+    }
+}

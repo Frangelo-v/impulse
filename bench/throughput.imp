@@ -1,0 +1,23 @@
+// Throughput: 100.000 señales propagadas a su handler.
+
+use io from "std/io"
+
+signal tick: Int [broadcast]
+
+shared total: Int = 0
+
+when tick(n: Int) {
+    shared.total += 1
+}
+
+node main() {
+    let i = 0
+    loop {
+        if i == 100000 {
+            break
+        }
+        signal tick(i)
+        i += 1
+    }
+    io.print("señales procesadas: " + shared.total)
+}

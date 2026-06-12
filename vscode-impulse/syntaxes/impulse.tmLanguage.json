@@ -1,0 +1,309 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Impulse",
+  "scopeName": "source.impulse",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#attributes"
+    },
+    {
+      "include": "#declarations"
+    },
+    {
+      "include": "#reactive"
+    },
+    {
+      "include": "#control"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#identifiers"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.impulse",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.impulse",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.impulse",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.impulse",
+              "match": "\\\\(n|r|t|\\\\|\"|u\\{[0-9A-Fa-f]+\\})"
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.impulse",
+          "match": "\\b0x[0-9A-Fa-f][0-9A-Fa-f_]*\\b"
+        },
+        {
+          "name": "constant.numeric.binary.impulse",
+          "match": "\\b0b[01][01_]*\\b"
+        },
+        {
+          "name": "constant.numeric.octal.impulse",
+          "match": "\\b0o[0-7][0-7_]*\\b"
+        },
+        {
+          "name": "constant.numeric.float.impulse",
+          "match": "\\b[0-9][0-9_]*\\.[0-9][0-9_]*([eE][+-]?[0-9]+)?\\b"
+        },
+        {
+          "name": "constant.numeric.integer.impulse",
+          "match": "\\b[0-9][0-9_]*\\b"
+        }
+      ]
+    },
+    "attributes": {
+      "patterns": [
+        {
+          "name": "meta.attribute.signal.impulse",
+          "begin": "\\[",
+          "end": "\\]",
+          "patterns": [
+            {
+              "name": "storage.modifier.signal-mode.impulse",
+              "match": "\\b(broadcast|queue|latest|coalesce|recursive|buffer|sample|budget|max_depth|max_fanout|scope|local|cluster|supervise|affinity|pin|isolated|noncritical|private|restricted|critical|realtime|idle|normal|max_restarts|window|infinite)\\b"
+            },
+            {
+              "include": "#strings"
+            },
+            {
+              "include": "#numbers"
+            },
+            {
+              "include": "#operators"
+            }
+          ]
+        }
+      ]
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "name": "meta.declaration.node.impulse",
+          "match": "\\b(node)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.node.impulse"
+            },
+            "2": {
+              "name": "entity.name.function.node.impulse"
+            }
+          }
+        },
+        {
+          "name": "meta.declaration.surge.impulse",
+          "match": "\\b(surge)\\b(?:\\s*\\[[^\\]]*\\])?\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.surge.impulse"
+            },
+            "2": {
+              "name": "entity.name.function.surge.impulse"
+            }
+          }
+        },
+        {
+          "name": "meta.declaration.signal.impulse",
+          "match": "\\b(signal)\\s+([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)?)\\s*:",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.signal.impulse"
+            },
+            "2": {
+              "name": "entity.name.signal.impulse"
+            }
+          }
+        },
+        {
+          "name": "meta.emit.signal.impulse",
+          "match": "\\b(signal)\\s+([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)?)",
+          "captures": {
+            "1": {
+              "name": "keyword.other.signal.impulse"
+            },
+            "2": {
+              "name": "variable.other.signal.impulse"
+            }
+          }
+        },
+        {
+          "name": "meta.declaration.type.impulse",
+          "match": "\\b(cluster|enum|actor|domain|supervisor)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.type.impulse"
+            },
+            "2": {
+              "name": "entity.name.type.impulse"
+            }
+          }
+        },
+        {
+          "name": "meta.declaration.binding.impulse",
+          "match": "\\b(let|const|shared)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.binding.impulse"
+            },
+            "2": {
+              "name": "variable.other.binding.impulse"
+            }
+          }
+        },
+        {
+          "name": "meta.import.impulse",
+          "match": "\\b(use)\\s+(\\{?\\s*[A-Za-z_][A-Za-z0-9_]*(?:\\s*,\\s*[A-Za-z_][A-Za-z0-9_]*)*\\s*\\}?)\\s+(from)\\b",
+          "captures": {
+            "1": {
+              "name": "keyword.control.import.impulse"
+            },
+            "2": {
+              "name": "entity.name.namespace.impulse"
+            },
+            "3": {
+              "name": "keyword.control.import.from.impulse"
+            }
+          }
+        }
+      ]
+    },
+    "reactive": {
+      "patterns": [
+        {
+          "name": "meta.reactive.handler.impulse",
+          "match": "\\b(when|on)\\s+([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)?)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.reactive.impulse"
+            },
+            "2": {
+              "name": "entity.name.signal.listener.impulse"
+            }
+          }
+        },
+        {
+          "name": "keyword.control.lifecycle.impulse",
+          "match": "\\b(start|stop|await|sleep|yield|pulse)\\b"
+        },
+        {
+          "name": "keyword.other.ownership.impulse",
+          "match": "\\b(share|move|copy)\\b"
+        }
+      ]
+    },
+    "control": {
+      "patterns": [
+        {
+          "name": "keyword.control.conditional.impulse",
+          "match": "\\b(if|else|match|loop|break|in)\\b"
+        },
+        {
+          "name": "keyword.operator.logical.impulse",
+          "match": "\\b(and|or|not|is|as)\\b"
+        },
+        {
+          "name": "keyword.control.supervision.impulse",
+          "match": "\\b(strategy|child|one_for_one|one_for_all|rest_for_one|escalate)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.impulse",
+          "match": "\\b(Int|Int32|Int8|Float|Float32|Bool|Str|Byte|Null|Trace)\\b"
+        },
+        {
+          "name": "support.type.user.impulse",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+        },
+        {
+          "name": "support.type.error.impulse",
+          "match": "\\berror\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.impulse",
+          "match": "\\b(true|false|null|self)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.assignment.impulse",
+          "match": "\\*\\*=|\\+=|-=|\\*=|/=|="
+        },
+        {
+          "name": "keyword.operator.pipe.impulse",
+          "match": "\\|>|<-|::|\\.\\."
+        },
+        {
+          "name": "keyword.operator.arithmetic.impulse",
+          "match": "\\*\\*|[+\\-*/%]"
+        },
+        {
+          "name": "keyword.operator.comparison.impulse",
+          "match": "==|!=|<=|>=|<|>"
+        },
+        {
+          "name": "keyword.operator.optional.impulse",
+          "match": "\\?\\?|\\?"
+        },
+        {
+          "name": "punctuation.separator.impulse",
+          "match": "[,:;.]"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "entity.name.function.call.impulse",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+// Archivos (fs) y tiempo (time)
+
+use io from "std/io"
+use fs from "std/fs"
+use time from "std/time"
+
+node main() {
+    let archivo = "golden_tmp.txt"
+
+    fs.write(archivo, "linea 1")
+    io.print("existe: " + fs.exists(archivo))
+
+    fs.append(archivo, "\nlinea 2")
+    let contenido = fs.read(archivo)
+    io.print("contenido:")
+    io.print(contenido)
+
+    fs.delete(archivo)
+    io.print("existe tras borrar: " + fs.exists(archivo))
+
+    // Leer un archivo inexistente devuelve un error matcheable
+    match fs.read("no_existe_999.txt") {
+        s: Str   -> io.print("leido: " + s)
+        e: error -> io.print("error " + e.code)
+    }
+
+    // time.now() da milisegundos desde epoch — verificamos que avanza
+    let t1 = time.now()
+    sleep 20
+    let t2 = time.now()
+    io.print("el tiempo avanza: " + (t2 > t1))
+}

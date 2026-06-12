@@ -1,0 +1,59 @@
+{
+  "Signal": {
+    "prefix": "signal",
+    "body": [
+      "signal ${1:name}: ${2:Type} [${3:broadcast}]"
+    ],
+    "description": "Declare an Impulse signal"
+  },
+  "Reactive handler": {
+    "prefix": "when",
+    "body": [
+      "when ${1:signal_name}(${2:value}: ${3:Type}) {",
+      "    ${0}",
+      "}"
+    ],
+    "description": "Declare a dormant reactive handler"
+  },
+  "Node": {
+    "prefix": "node",
+    "body": [
+      "node ${1:name}(${2}) -> ${3:Type} {",
+      "    pulse ${0}",
+      "}"
+    ],
+    "description": "Declare a computation node"
+  },
+  "Surge": {
+    "prefix": "surge",
+    "body": [
+      "surge${1:[supervise: 5]} ${2:name}(${3}) {",
+      "    ${0}",
+      "}"
+    ],
+    "description": "Declare an active surge"
+  },
+  "Actor": {
+    "prefix": "actor",
+    "body": [
+      "actor ${1:Name} {",
+      "    let ${2:state}: ${3:Type} = ${4:value}",
+      "",
+      "    node ${5:method}() {",
+      "        ${0}",
+      "    }",
+      "}"
+    ],
+    "description": "Declare an isolated actor"
+  },
+  "Supervisor": {
+    "prefix": "supervisor",
+    "body": [
+      "supervisor ${1:AppSupervisor} {",
+      "    strategy: ${2:one_for_one}",
+      "    child ${3:worker}: ${4:worker}() [max_restarts: ${5:5}, window: ${6:60_000}]",
+      "}"
+    ],
+    "description": "Declare a supervision tree"
+  }
+}

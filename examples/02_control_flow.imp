@@ -1,0 +1,34 @@
+// Control de flujo: if/else, loop con break, loop sobre listas, match
+
+use io from "std/io"
+
+node clasifica(n: Int) -> Str {
+    match n {
+        0       -> "cero"
+        1..10   -> "pequeño"
+        10..=99 -> "mediano"
+        _       -> "grande"
+    }
+}
+
+node main() {
+    // loop con contador y break
+    let i = 0
+    loop {
+        if i == 3 {
+            break
+        }
+        io.print("vuelta " + i)
+        i += 1
+    }
+
+    // loop for-each sobre lista
+    loop item in ["a", "b", "c"] {
+        io.print("item: " + item)
+    }
+
+    io.print(clasifica(0))
+    io.print(clasifica(5))
+    io.print(clasifica(50))
+    io.print(clasifica(500))
+}

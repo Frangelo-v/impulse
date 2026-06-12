@@ -1,0 +1,30 @@
+// Nodos, pulse y el operador pipe
+
+use io from "std/io"
+
+node doble(n: Int) -> Int {
+    pulse n * 2
+}
+
+node suma_uno(n: Int) -> Int {
+    pulse n + 1
+}
+
+node cuadrado(n: Int) -> Int {
+    pulse n * n
+}
+
+node main() {
+    let a = doble(21)
+    io.print("doble: " + a)
+
+    let b = 5 |> doble
+    io.print("pipe doble: " + b)
+
+    let c = 3 |> suma_uno |> cuadrado
+    io.print("encadenado: " + c)
+
+    io.print("math.sqrt 16: " + math.sqrt(16))
+    io.print("math.abs -7: " + math.abs(0 - 7))
+    io.print("math.floor 3.9: " + math.floor(3.9))
+}

@@ -1,0 +1,6 @@
+doble: 42
+pipe doble: 10
+encadenado: 16
+math.sqrt 16: 4
+math.abs -7: 7
+math.floor 3.9: 3

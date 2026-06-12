@@ -1,0 +1,134 @@
+{
+  "name": "impulse-language",
+  "displayName": "Impulse Language",
+  "description": "Syntax, snippets, and the Synapse Bloom theme for Impulse dormant reactive propagation code.",
+  "version": "0.1.5",
+  "publisher": "impulse-lang",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:impulse",
+    "onCommand:impulse.checkFile",
+    "onCommand:impulse.emitGraph",
+    "onCommand:impulse.emitAst",
+    "onCommand:impulse.emitTokens"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Themes",
+    "Snippets"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "impulse",
+        "aliases": [
+          "Impulse",
+          "impulse"
+        ],
+        "extensions": [
+          ".imp"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "impulse",
+        "scopeName": "source.impulse",
+        "path": "./syntaxes/impulse.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "Impulse Synapse Bloom",
+        "uiTheme": "vs-dark",
+        "path": "./themes/impulse-synapse-bloom-color-theme.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "impulse",
+        "path": "./snippets/impulse.code-snippets"
+      }
+    ],
+    "commands": [
+      {
+        "command": "impulse.checkFile",
+        "title": "Impulse: Check Current File",
+        "category": "Impulse"
+      },
+      {
+        "command": "impulse.emitGraph",
+        "title": "Impulse: Emit Signal Graph",
+        "category": "Impulse"
+      },
+      {
+        "command": "impulse.emitAst",
+        "title": "Impulse: Emit AST",
+        "category": "Impulse"
+      },
+      {
+        "command": "impulse.emitTokens",
+        "title": "Impulse: Emit Tokens",
+        "category": "Impulse"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "impulse.checkFile",
+          "when": "resourceExtname == .imp",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "impulse.checkFile",
+          "when": "resourceExtname == .imp",
+          "group": "navigation"
+        },
+        {
+          "command": "impulse.emitGraph",
+          "when": "resourceExtname == .imp",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Impulse",
+      "properties": {
+        "impulse.compilerPath": {
+          "type": "string",
+          "default": "impulsec",
+          "description": "Path to the impulsec executable. If not found, the extension tries common workspace build locations."
+        },
+        "impulse.checkOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run impulsec --check automatically when saving .imp files."
+        },
+        "impulse.checkOnType": {
+          "type": "boolean",
+          "default": false,
+          "description": "Run impulsec --check after editing .imp files. Disabled by default to keep the extension nearly idle."
+        },
+        "impulse.checkDelayMs": {
+          "type": "number",
+          "default": 1200,
+          "minimum": 250,
+          "description": "Debounce delay before check-on-type diagnostics run."
+        },
+        "impulse.maxCheckFileKb": {
+          "type": "number",
+          "default": 512,
+          "minimum": 16,
+          "description": "Skip automatic diagnostics for .imp files larger than this size."
+        }
+      }
+    }
+  }
+}

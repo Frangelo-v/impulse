@@ -1,0 +1,20 @@
+// Métodos de Str
+
+use io from "std/io"
+
+node main() {
+    let s = "  Hola Mundo  "
+    let limpio = s.trim()
+    io.print("[" + limpio + "]")
+    io.print("len: " + limpio.len())
+    io.print("upper: " + limpio.to_upper())
+    io.print("lower: " + limpio.to_lower())
+    io.print("contiene Mundo: " + limpio.contains("Mundo"))
+    io.print("empieza Hola: " + limpio.starts_with("Hola"))
+    io.print("reemplazo: " + limpio.replace("Mundo", "Impulse"))
+
+    let csv = "uno,dos,tres"
+    let partes = csv.split(",")
+    io.print("partes: " + partes.len())
+    io.print("primera: " + partes.get(0))
+}

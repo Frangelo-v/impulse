@@ -1,0 +1,26 @@
+// Señales y propagación: handlers durmientes que despiertan en cadena
+
+use io from "std/io"
+
+signal pedido:     Str [broadcast]
+signal cobrado:    Str [broadcast]
+signal notificar:  Str [broadcast]
+
+when pedido(producto: Str) {
+    io.print("[pedido] " + producto)
+    signal cobrado(producto)
+}
+
+when cobrado(producto: Str) {
+    io.print("[cobro] " + producto)
+    signal notificar("enviado: " + producto)
+}
+
+when notificar(msg: Str) {
+    io.print("[aviso] " + msg)
+}
+
+node main() {
+    signal pedido("teclado")
+    signal pedido("monitor")
+}

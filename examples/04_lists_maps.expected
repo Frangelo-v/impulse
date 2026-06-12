@@ -1,0 +1,15 @@
+len: 5
+tercero: 3
+contiene 4: true
+doble del primero: 2
+doble del ultimo: 10
+pares: 2
+host: localhost
+puerto: 8080
+tiene host: true
+claves: 2
+tras push: 3
+pop devuelve: 30
+tras pop: 2
+tiene debug: true
+tras delete: 2

@@ -1,0 +1,39 @@
+// Actores con estado propio y estado compartido atómico
+
+use io from "std/io"
+
+actor Contador {
+    let valor: Int = 0
+
+    node incrementa() {
+        self.valor += 1
+    }
+
+    node suma(n: Int) {
+        self.valor += n
+    }
+
+    node total() -> Int {
+        pulse self.valor
+    }
+}
+
+shared visitas: Int = 0
+
+signal visita: Str [broadcast]
+
+when visita(quien: Str) {
+    Contador.incrementa()
+    shared.visitas += 1
+    io.print("visita de " + quien)
+}
+
+node main() {
+    signal visita("ana")
+    signal visita("luis")
+    signal visita("eva")
+
+    Contador.suma(10)
+    io.print("contador: " + Contador.total())
+    io.print("visitas compartidas: " + shared.visitas)
+}

@@ -1,0 +1,26 @@
+// Estilo Impulse: handlers durmientes. Tras el trabajo inicial, el proceso
+// queda vivo pero dormido — la tesis del lenguaje: costo ~0 cuando nada pasa.
+
+use io from "std/io"
+
+signal trabajo: Int [broadcast]
+
+shared procesados: Int = 0
+
+when trabajo(n: Int) {
+    shared.procesados += n
+}
+
+surge corazon() {
+    loop {
+        sleep 60000
+    }
+}
+
+node main() {
+    start corazon()
+    signal trabajo(1)
+    signal trabajo(2)
+    signal trabajo(3)
+    io.print("listo, dormido. procesados: " + shared.procesados)
+}

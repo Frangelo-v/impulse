@@ -1,0 +1,44 @@
+// Listas y mapas
+
+use io from "std/io"
+
+node doble(n: Int) -> Int {
+    pulse n * 2
+}
+
+node es_par(n: Int) -> Bool {
+    pulse n % 2 == 0
+}
+
+node main() {
+    let nums = [1, 2, 3, 4, 5]
+    io.print("len: " + nums.len())
+    io.print("tercero: " + nums.get(2))
+    io.print("contiene 4: " + nums.contains(4))
+
+    let dobles = nums.map("doble")
+    io.print("doble del primero: " + dobles.get(0))
+    io.print("doble del ultimo: " + dobles.get(4))
+
+    let pares = nums.filter("es_par")
+    io.print("pares: " + pares.len())
+
+    let config = ["host": "localhost", "puerto": 8080]
+    io.print("host: " + config.get("host"))
+    io.print("puerto: " + config.get("puerto"))
+    io.print("tiene host: " + config.has("host"))
+    io.print("claves: " + config.keys().len())
+
+    // Mutación real: push/pop modifican la lista, set/delete el mapa
+    let cola = [10, 20]
+    cola.push(30)
+    io.print("tras push: " + cola.len())
+    let sacado = cola.pop()
+    io.print("pop devuelve: " + sacado)
+    io.print("tras pop: " + cola.len())
+
+    config.set("debug", true)
+    io.print("tiene debug: " + config.has("debug"))
+    config.delete("puerto")
+    io.print("tras delete: " + config.keys().len())
+}

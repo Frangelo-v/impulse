@@ -1,0 +1,35 @@
+// Clusters: datos con métodos
+
+use io from "std/io"
+
+cluster Punto {
+    let x: Int
+    let y: Int
+
+    node describe() -> Str {
+        pulse "(" + self.x + ", " + self.y + ")"
+    }
+
+    node manhattan() -> Int {
+        pulse self.x + self.y
+    }
+}
+
+cluster Usuario {
+    let id:     Int
+    let nombre: Str
+
+    node saluda() -> Str {
+        pulse "hola " + self.nombre + " (#" + self.id + ")"
+    }
+}
+
+node main() {
+    let p = Punto { x: 3, y: 4 }
+    io.print("punto: " + p.describe())
+    io.print("manhattan: " + p.manhattan())
+    io.print("campo x: " + p.x)
+
+    let u = Usuario { id: 7, nombre: "alex" }
+    io.print(u.saluda())
+}

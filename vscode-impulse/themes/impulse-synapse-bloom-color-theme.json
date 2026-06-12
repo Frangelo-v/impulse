@@ -1,0 +1,223 @@
+{
+  "$schema": "vscode://schemas/color-theme",
+  "name": "Impulse Synapse Bloom",
+  "type": "dark",
+  "colors": {
+    "editor.background": "#090A12",
+    "editor.foreground": "#E8E4D8",
+    "editorLineNumber.foreground": "#3B4259",
+    "editorLineNumber.activeForeground": "#D7B46A",
+    "editorCursor.foreground": "#FFDF7E",
+    "editor.selectionBackground": "#31415688",
+    "editor.inactiveSelectionBackground": "#26324570",
+    "editor.lineHighlightBackground": "#111827",
+    "editorBracketMatch.background": "#203C4A",
+    "editorBracketMatch.border": "#68E1FD",
+    "editorWhitespace.foreground": "#263045",
+    "sideBar.background": "#0D0F18",
+    "activityBar.background": "#080A10",
+    "statusBar.background": "#101829",
+    "statusBar.foreground": "#DDE7D6",
+    "tab.activeBackground": "#111827",
+    "tab.inactiveBackground": "#0C101A",
+    "panel.background": "#0D111C",
+    "terminal.background": "#090A12",
+    "terminal.foreground": "#E8E4D8"
+  },
+  "tokenColors": [
+    {
+      "name": "Base text",
+      "scope": [
+        "source.impulse"
+      ],
+      "settings": {
+        "foreground": "#E8E4D8"
+      }
+    },
+    {
+      "name": "Dormant comments",
+      "scope": [
+        "comment"
+      ],
+      "settings": {
+        "foreground": "#62708A",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "Signal declarations and emissions",
+      "scope": [
+        "keyword.declaration.signal.impulse",
+        "keyword.other.signal.impulse",
+        "entity.name.signal.impulse",
+        "variable.other.signal.impulse"
+      ],
+      "settings": {
+        "foreground": "#4EE7F5",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "Reactive membrane",
+      "scope": [
+        "keyword.control.reactive.impulse",
+        "entity.name.signal.listener.impulse"
+      ],
+      "settings": {
+        "foreground": "#FF8C6B",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "Node and surge names",
+      "scope": [
+        "keyword.declaration.node.impulse",
+        "keyword.declaration.surge.impulse",
+        "entity.name.function.node.impulse",
+        "entity.name.function.surge.impulse",
+        "entity.name.function.call.impulse"
+      ],
+      "settings": {
+        "foreground": "#D9F99D"
+      }
+    },
+    {
+      "name": "Types and architecture",
+      "scope": [
+        "keyword.declaration.type.impulse",
+        "entity.name.type.impulse",
+        "storage.type.primitive.impulse",
+        "support.type.user.impulse"
+      ],
+      "settings": {
+        "foreground": "#C6A6FF"
+      }
+    },
+    {
+      "name": "Bindings and shared state",
+      "scope": [
+        "storage.type.binding.impulse",
+        "variable.other.binding.impulse"
+      ],
+      "settings": {
+        "foreground": "#A7F3D0"
+      }
+    },
+    {
+      "name": "Lifecycle pulses",
+      "scope": [
+        "keyword.control.lifecycle.impulse"
+      ],
+      "settings": {
+        "foreground": "#FFD166",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "Control flow",
+      "scope": [
+        "keyword.control.conditional.impulse",
+        "keyword.control.supervision.impulse"
+      ],
+      "settings": {
+        "foreground": "#F0A6CA"
+      }
+    },
+    {
+      "name": "Signal modes and attributes",
+      "scope": [
+        "meta.attribute.signal.impulse",
+        "storage.modifier.signal-mode.impulse"
+      ],
+      "settings": {
+        "foreground": "#7DD3FC"
+      }
+    },
+    {
+      "name": "Ownership modes",
+      "scope": [
+        "keyword.other.ownership.impulse"
+      ],
+      "settings": {
+        "foreground": "#8CE99A",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "Errors",
+      "scope": [
+        "support.type.error.impulse"
+      ],
+      "settings": {
+        "foreground": "#FF5D73",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "Strings",
+      "scope": [
+        "string.quoted.double.impulse"
+      ],
+      "settings": {
+        "foreground": "#B8F7C1"
+      }
+    },
+    {
+      "name": "Escapes",
+      "scope": [
+        "constant.character.escape.impulse"
+      ],
+      "settings": {
+        "foreground": "#F9E2AF",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "Numbers",
+      "scope": [
+        "constant.numeric"
+      ],
+      "settings": {
+        "foreground": "#FFB86B"
+      }
+    },
+    {
+      "name": "Constants",
+      "scope": [
+        "constant.language.impulse"
+      ],
+      "settings": {
+        "foreground": "#F7A8B8"
+      }
+    },
+    {
+      "name": "Operators",
+      "scope": [
+        "keyword.operator"
+      ],
+      "settings": {
+        "foreground": "#83C5FF"
+      }
+    },
+    {
+      "name": "Punctuation",
+      "scope": [
+        "punctuation.separator.impulse"
+      ],
+      "settings": {
+        "foreground": "#8B95AD"
+      }
+    },
+    {
+      "name": "Imports",
+      "scope": [
+        "keyword.control.import.impulse",
+        "keyword.control.import.from.impulse",
+        "entity.name.namespace.impulse"
+      ],
+      "settings": {
+        "foreground": "#BDE0FE"
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+// Básicos: variables, aritmética, strings y condicionales
+
+use io from "std/io"
+
+node main() {
+    let x = 10
+    let y = 3
+    io.print("suma: " + (x + y))
+    io.print("resta: " + (x - y))
+    io.print("multi: " + (x * y))
+    io.print("div: " + (x / y))
+
+    let nombre = "impulse"
+    io.print("hola " + nombre)
+
+    let activo = true
+    if activo {
+        io.print("activo")
+    } else {
+        io.print("inactivo")
+    }
+
+    if x > y and not (x == y) {
+        io.print("x gana")
+    }
+}

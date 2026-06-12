@@ -1,0 +1,9 @@
+[Hola Mundo]
+len: 10
+upper: HOLA MUNDO
+lower: hola mundo
+contiene Mundo: true
+empieza Hola: true
+reemplazo: Hola Impulse
+partes: 3
+primera: uno

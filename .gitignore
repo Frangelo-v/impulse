@@ -1,0 +1,11 @@
+/compiler/target/
+/target/
+/vscode-impulse/*.vsix
+/vscode-impulse/node_modules/
+*.log
+*.tmp
+.DS_Store
+
+out.txt
+err.txt
+.claude/

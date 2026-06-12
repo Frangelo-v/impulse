@@ -1,0 +1,145 @@
+// Impulse — ejemplo completo de prueba
+
+use io from "std/io"
+
+// ── Señales ──────────────────────────────────────────────────────────────────
+
+signal user_login:      Str   [broadcast, max_fanout: 64, budget: 10]
+signal user_logout:     Str   [broadcast]
+signal request:         Str   [broadcast, max_fanout: 128]
+signal alert:           Str   [broadcast]
+
+// ── Dominio con aislamiento ───────────────────────────────────────────────────
+
+domain analytics [noncritical] {
+    signal page_view: Str [buffer: 1024]
+}
+
+// ── Variantes ─────────────────────────────────────────────────────────────────
+
+enum Status {
+    Online
+    Away { since: Int }
+    Offline
+}
+
+// ── Cluster con método ────────────────────────────────────────────────────────
+
+cluster User {
+    let id:   Int
+    let name: Str
+
+    node greet() -> Str {
+        pulse "hello " + self.name
+    }
+}
+
+// ── Actor ─────────────────────────────────────────────────────────────────────
+
+actor Sessions {
+    let count: Int = 0
+
+    node add() {
+        self.count += 1
+    }
+
+    node total() -> Int {
+        pulse self.count
+    }
+}
+
+// ── Estado atómico compartido ─────────────────────────────────────────────────
+
+shared hit_count: Int = 0
+
+// ── Surges reactivos ──────────────────────────────────────────────────────────
+
+when user_login(name: Str) {
+    Sessions.add()
+    shared.hit_count += 1
+    signal alert("welcome: " + name)
+}
+
+when user_login(name: Str) {
+    signal analytics::page_view("/login?user=" + name)
+}
+
+when user_logout(name: Str) {
+    signal alert("bye: " + name)
+}
+
+when request(path: Str) {
+    io.print("[request] " + path)
+}
+
+when analytics::page_view(path: Str) {
+    io.print("[page] " + path)
+}
+
+when alert(msg: Str) {
+    io.print("[alert] " + msg)
+}
+
+// ── Surge activo con supervisión ──────────────────────────────────────────────
+
+surge[supervise: 5] request_handler() {
+    loop {
+        sleep 1000
+        io.print("handler alive, hits: " + shared.hit_count)
+    }
+}
+
+// ── Supervisor ────────────────────────────────────────────────────────────────
+
+supervisor AppSupervisor {
+    strategy: one_for_one
+    child handler: request_handler() [max_restarts: 5, window: 60_000]
+}
+
+// ── Nodo con match de variante ────────────────────────────────────────────────
+
+node describe(s: Status) -> Str {
+    match s {
+        Status.Online       -> "online"
+        Status.Away { since } -> "away since " + since
+        Status.Offline      -> "offline"
+    }
+}
+ 
+// ── Nodo con pipe ─────────────────────────────────────────────────────────────
+
+node process(input: Str) -> Str {
+    pulse input
+}
+
+// ── Nodo con error handling ───────────────────────────────────────────────────
+
+node parse_id(s: Str) -> Int | error {
+    if s == "" {
+        pulse error { message: "empty id", code: 400 }
+    }
+    pulse 42
+}
+
+// ── Entry point ───────────────────────────────────────────────────────────────
+
+node main() {
+    start AppSupervisor
+    signal user_login("alex")
+    signal user_login("maria")
+    signal user_logout("alex")
+
+    let u = User { id: 1, name: "test" }
+    let greeting = u.greet()
+    io.print(greeting)
+
+    let status = Status.Away { since: 1000 }
+    let desc   = describe(status)
+    io.print(desc)
+
+    let result = parse_id("abc")
+    match result {
+        n: Int    -> io.print("id: " + n)
+        e: error -> io.print("error: " + e.message)
+    }
+}
