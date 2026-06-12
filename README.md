@@ -48,6 +48,25 @@ Programs declare signals, dormant handlers, actors, domains, and supervised
 long-running surges. Work wakes through propagation instead of unstructured
 detached tasks.
 
+## A note from the author
+
+Impulse is a very ambitious personal project I dreamed up a long time ago.
+I wanted to build something people would *truly love to use*: a language that
+works like a brain — code that sleeps and only wakes when something real
+happens, easy to write, honest about its costs.
+
+I'm one person, so not everything I imagined made it into this version —
+the full vision (native compilation, distributed propagation, the complete
+runtime described in the spec) is still ahead. But the core thesis is here,
+working and measured, and I'd rather share it now than keep it in a drawer:
+I just wanted to see what happens when it meets the world.
+
+This is the first beta. I'll keep publishing versions as time goes on.
+I hope you like it — and if you try it, tell me what you think. Every issue,
+idea, or "this broke" report genuinely helps.
+
+— Frangelo ([@Frangelo-v](https://github.com/Frangelo-v))
+
 ## Current Components
 
 - `compiler/` - lexer, parser, semantic analysis, execution backends, and runtime primitives.
