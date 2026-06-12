@@ -20,7 +20,8 @@ Primera versión beta pública del lenguaje Impulse.
 
 ### Stdlib
 - `io.print/eprint`, `math.*`, `time.now()`,
-  `fs.read/write/append/exists/delete`, `http.get/post` (HTTPS).
+  `fs.read/write/append/exists/delete`, `http.get/post/encode` (HTTPS),
+  `json.parse/stringify` (respuestas de API → maps/lists nativos).
 
 ### Runtime
 - Tesis medible: 0% CPU en reposo (handlers aparcados, sin polling — los

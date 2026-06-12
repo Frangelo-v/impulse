@@ -939,6 +939,10 @@ impl Evaluator {
         if matches!(&object.kind, ExprKind::Ident(n) if n == "http") {
             return self.call_http(method, args, env);
         }
+        // json.* namespace
+        if matches!(&object.kind, ExprKind::Ident(n) if n == "json") {
+            return self.call_json(method, args, env);
+        }
         // Actor method
         if let ExprKind::Ident(actor_name) = &object.kind {
             if self.tables.actors.contains_key(actor_name) {
@@ -1054,6 +1058,10 @@ impl Evaluator {
     fn call_http(&self, method: &str, args: &[Expr], env: &mut Env) -> RunResult<Value> {
         let vals = self.eval_args(args, env)?;
         let url = vals.first().map(|v| v.display()).unwrap_or_default();
+        // http.encode(text): percent-encoding para meter texto en una URL
+        if method == "encode" {
+            return Ok(Value::Str(percent_encode(&url)));
+        }
         let agent = ureq::AgentBuilder::new()
             .timeout(Duration::from_secs(30))
             .build();
@@ -1078,6 +1086,26 @@ impl Evaluator {
             }
             Err(e) => Self::std_error(format!("request failed: {}", e), 0),
         })
+    }
+
+    fn call_json(&self, method: &str, args: &[Expr], env: &mut Env) -> RunResult<Value> {
+        let vals = self.eval_args(args, env)?;
+        match method {
+            // json.parse(text) → Map/List/Str/Int/... nativos, navegables con .get()
+            "parse" => {
+                let text = vals.first().map(|v| v.display()).unwrap_or_default();
+                Ok(match serde_json::from_str::<serde_json::Value>(&text) {
+                    Ok(v)  => json_to_value(v),
+                    Err(e) => Self::std_error(format!("invalid JSON: {}", e), 400),
+                })
+            }
+            // json.stringify(value) → texto JSON
+            "stringify" => {
+                let v = vals.first().cloned().unwrap_or(Value::Null);
+                Ok(Value::Str(value_to_json(&v).to_string()))
+            }
+            _ => Err(format!("unknown json.{} — available: parse(text), stringify(value)", method)),
+        }
     }
 
     fn call_math(&self, method: &str, args: &[Expr], env: &mut Env) -> RunResult<Value> {
@@ -1368,6 +1396,57 @@ impl Evaluator {
 
     fn eval_args(&self, args: &[Expr], env: &mut Env) -> RunResult<Vec<Value>> {
         args.iter().map(|a| self.eval_expr(a, env)).collect()
+    }
+}
+
+// Percent-encode un valor de query string (RFC 3986 unreserved se deja igual).
+fn percent_encode(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for b in s.bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' =>
+                out.push(b as char),
+            _ => out.push_str(&format!("%{:02X}", b)),
+        }
+    }
+    out
+}
+
+// ── JSON ↔ Value conversion ────────────────────────────────────────────────────
+
+fn json_to_value(j: serde_json::Value) -> Value {
+    use serde_json::Value as J;
+    match j {
+        J::Null      => Value::Null,
+        J::Bool(b)   => Value::Bool(b),
+        J::String(s) => Value::Str(s),
+        J::Number(n) => {
+            if let Some(i) = n.as_i64() { Value::Int(i) }
+            else { Value::Float(n.as_f64().unwrap_or(0.0)) }
+        }
+        J::Array(arr) => Value::List(arr.into_iter().map(json_to_value).collect()),
+        J::Object(obj) => Value::Map(
+            obj.into_iter().map(|(k, v)| (k, json_to_value(v))).collect()
+        ),
+    }
+}
+
+fn value_to_json(v: &Value) -> serde_json::Value {
+    use serde_json::Value as J;
+    match v {
+        Value::Null     => J::Null,
+        Value::Bool(b)  => J::Bool(*b),
+        Value::Int(i)   => J::from(*i),
+        Value::Float(f) => J::from(*f),
+        Value::Str(s)   => J::String(s.clone()),
+        Value::List(items) => J::Array(items.iter().map(value_to_json).collect()),
+        Value::Map(entries) => J::Object(
+            entries.iter().map(|(k, v)| (k.clone(), value_to_json(v))).collect()
+        ),
+        // clusters/variants/errores se serializan por sus campos
+        Value::Object { fields, .. } | Value::Variant { fields, .. } => J::Object(
+            fields.iter().map(|(k, v)| (k.clone(), value_to_json(v))).collect()
+        ),
     }
 }
 

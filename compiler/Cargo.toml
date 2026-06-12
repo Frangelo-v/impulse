@@ -17,3 +17,6 @@ clap = { version = "4", features = ["derive"] }
 # std/http: blocking HTTP client for bots (TLS via rustls, no system deps)
 ureq = "2"
 
+# std/json: parse API responses (Telegram, REST) into native maps/lists
+serde_json = "1"
+

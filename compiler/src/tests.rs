@@ -702,6 +702,49 @@ mod tests {
     }
 
     #[test]
+    fn exec_json_parse_telegram_shape() {
+        // La forma exacta que devuelve getUpdates de Telegram, navegada con .get()
+        let src = r#"
+            node main() {
+                let body = "{\"ok\": true, \"result\": [{\"update_id\": 99, \"message\": {\"text\": \"hola\", \"chat\": {\"id\": 555}}}]}"
+                let data = json.parse(body)
+                let updates = data.get("result")
+                let upd = updates.get(0)
+                let uid = upd.get("update_id")
+                let msg = upd.get("message")
+                let text = msg.get("text")
+                let chat_id = msg.get("chat").get("id")
+                if uid == 99 and text == "hola" and chat_id == 555 { } else { let boom = 1 / 0 }
+            }
+        "#;
+        assert!(exec(src).is_ok(), "no se navegó la respuesta de Telegram");
+    }
+
+    #[test]
+    fn exec_json_roundtrip() {
+        let src = r#"
+            node main() {
+                let original = ["nombre": "impulse", "version": 1]
+                let texto = json.stringify(original)
+                let vuelta = json.parse(texto)
+                if vuelta.get("nombre") == "impulse" and vuelta.get("version") == 1 { } else { let boom = 1 / 0 }
+            }
+        "#;
+        assert!(exec(src).is_ok(), "json stringify/parse no es ida y vuelta");
+    }
+
+    #[test]
+    fn exec_http_encode() {
+        let src = r#"
+            node main() {
+                let e = http.encode("a b&c")
+                if e == "a%20b%26c" { } else { let boom = 1 / 0 }
+            }
+        "#;
+        assert!(exec(src).is_ok(), "http.encode incorrecto");
+    }
+
+    #[test]
     fn exec_pipe_operator() {
         let src = r#"
             node double(n: Int) -> Int { pulse n * 2 }

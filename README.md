@@ -81,7 +81,8 @@ idea, or "this broke" report genuinely helps.
 - `math` — `floor`, `ceil`, `sqrt`, `abs`, `min`, `max`, `pow`
 - `time` — `now()` (epoch milliseconds)
 - `fs` — `read(path)`, `write(path, content)`, `append(path, content)`, `exists(path)`, `delete(path)`
-- `http` — `get(url)`, `post(url, body)` (HTTPS, 30s timeout, JSON content type on post)
+- `http` — `get(url)`, `post(url, body)`, `encode(text)` (HTTPS, 30s timeout)
+- `json` — `parse(text)` → native map/list, `stringify(value)` → JSON text
 
 `fs` and `http` return `Str | error`, so failures match with `e: error` like any
 user error. String literals support `\n`, `\t`, `\r`, `\"`, `\\` escapes.
